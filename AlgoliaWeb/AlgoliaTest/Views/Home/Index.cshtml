@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Marine Max</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <ol id="spCondition"></ol>
+        </div>
+        <div class="col-sm-3">
+            <ol id="spBoatTypes"></ol>
+        </div>
+        <div class="col-sm-3">
+            <ol id="spFuelTypes"></ol>
+        </div>
+        <div class="col-sm-3">
+            <p>Geo</p>
+            <input type="text" id="txtLatitude" />
+            <input type="text" id="txtLongitude" />
+
+            <p>Radius (miles)</p>
+            <input type="text" id="txtRadiusInMiles" />
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3 max-height">
+            <ol id="spMakes"></ol>
+        </div>
+        <div class="col-sm-3 max-height">
+            <ol id="spModels"></ol>
+        </div>
+        <div class="col-sm-3 max-height">
+            <p>Records Per Page</p>
+            <input type="text" id="txtRecordsPerPage" value="2" />
+            <p>Page Number</p>
+            <input type="text" id="txtPageNumber" value="0" />
+        </div>
+        <div class="col-sm-3 max-height">
+            yy
+        </div>
+    </div>
+</div>
+
+<a href="javascript: refine();">Refine</a> | 
+<a href="javascript: reset();">Reset</a>
+
+<hr />
+<div>
+    <h3>Results (<span id="num-results"></span>)</h3>
+    <ol id="spHits"></ol>
+</div>
+
+<hr />
+
+<h3>Raw Output</h3>
+<pre id="raw-output"></pre>
+
+
