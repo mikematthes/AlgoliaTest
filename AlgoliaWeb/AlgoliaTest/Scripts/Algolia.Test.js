@@ -35,6 +35,8 @@ Makes
 */
 function showMakes(data) {
     $("#spMakes").empty();
+    if (data.disjunctiveFacets.length < 1) return;
+
     for (var s in data.disjunctiveFacets[0].data) {
         $("#spMakes").append('<li><input class="chkMake" name="chkMake" type="checkbox" value="'
             + s + '" />'
@@ -67,6 +69,8 @@ Models
 */
 function showModels(data) {
     $("#spModels").empty();
+    if (data.disjunctiveFacets.length < 2) return;
+
     for (var s in data.disjunctiveFacets[1].data) {
         $("#spModels").append('<li><input class="chkModel" name="chkModel" type="checkbox" value="'
             + s + '" />'
@@ -99,6 +103,8 @@ Condition
 */
 function showCondition(data) {
     $("#spCondition").empty();
+    if (data.disjunctiveFacets.length < 3) return;
+
     for (var s in data.disjunctiveFacets[2].data) {
         $("#spCondition").append('<li><input class="chkCondition" name="chkCondition" type="checkbox" value="'
             + s + '" />'
@@ -131,6 +137,8 @@ Fuel Type
 */
 function showFuelTypes(data) {
     $("#spFuelTypes").empty();
+    if (data.disjunctiveFacets.length < 4) return;
+
     for (var s in data.disjunctiveFacets[3].data) {
         $("#spFuelTypes").append('<li><input class="chkFuelTypes" name="chkFuelTypes" type="checkbox" value="'
             + s + '" />'
@@ -163,6 +171,8 @@ Boat Type
 */
 function showBoatTypes(data) {
     $("#spBoatTypes").empty();
+    if (data.disjunctiveFacets.length < 5) return;
+
     for (var s in data.disjunctiveFacets[4].data) {
         $("#spBoatTypes").append('<li><input class="chkBoatTypes" name="chkBoatTypes" type="checkbox" value="'
             + s + '" />'
@@ -196,6 +206,13 @@ function addOtherFiltersAndGetResults()
     mmFilter.radiusInMiles = $('#txtRadiusInMiles').val();
     mmFilter.pageNumber = $('#txtPageNumber').val();
     mmFilter.recordsPerPage = $('#txtRecordsPerPage').val();
+    mmFilter.yearStart =$('#txtYearStart').val();;
+    mmFilter.yearEnd =  $('#txtYearEnd').val();
+    mmFilter.priceStart = $('#txtPriceStart').val();
+    mmFilter.priceEnd = $('#txtPriceEnd').val();
+    mmFilter.lengthStart = $('#txtLengthStart').val();
+    mmFilter.lengthEnd = $('#txtLengthEnd').val();
+    mmFilter.keyword = $('#txtKeyword').val();
 
     repo.getInventoryWithRefinements(mmFilter);
 }

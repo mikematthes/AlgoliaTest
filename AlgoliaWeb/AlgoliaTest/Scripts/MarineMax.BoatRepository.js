@@ -18,7 +18,21 @@ MarineMax.BoatRepository = function () {
             //aroundLatLng: "0,0"
         };
 
+        addFilters(params, boatFilter);
+
+        var helper = algoliasearchHelper(client, 'MarineMaxSearchInventory-Dev-HS-Length-Desc', params);
+
+        addRangeRefinements(helper, boatFilter);
+
+        //helper.addFacetRefinement("DealerId", "44117")
+        //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
+
+        return helper;
+    }
+
+    function addFilters(params, boatFilter) {
         if (boatFilter) {
+            //geo
             if (boatFilter.latitude
                     && !isNaN(boatFilter.latitude)
                     && boatFilter.longitude
@@ -26,28 +40,68 @@ MarineMax.BoatRepository = function () {
                 params.aroundLatLng = boatFilter.latitude + "," + boatFilter.longitude;
             }
 
+            //radius
             if (boatFilter.radiusInMiles && !isNaN(boatFilter.radiusInMiles)) {
                 params.aroundRadius = convertMilesToMeters(boatFilter.radiusInMiles);
             }
 
+            //records per page
             if (boatFilter.recordsPerPage && !isNaN(boatFilter.recordsPerPage)) {
                 params.hitsPerPage = boatFilter.recordsPerPage;
             }
 
+            //page number
             if (boatFilter.pageNumber && !isNaN(boatFilter.pageNumber)) {
                 params.page = boatFilter.pageNumber;
+            }
+
+            //keyword
+            if (boatFilter.keyword != null && boatFilter.keyword.length > 0) {
+                params.query = boatFilter.keyword;
             }
         }
         else {
             //default params
         }
+    }
 
-        var helper = algoliasearchHelper(client, 'MarineMaxSearchInventory-Dev-HS-Length-Desc', params);
+    function addRangeRefinements(helper, boatFilter) {
 
-        //helper.addFacetRefinement("DealerId", "44117")
-        //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
+            //year range
+        if (boatFilter.yearStart
+                && !isNaN(boatFilter.yearStart)
+                && boatFilter.yearStart != 0
+                && !isNaN(boatFilter.yearEnd)
+                && !isNaN(boatFilter.yearEnd)
+                && boatFilter.yearEnd != 0) {
 
-        return helper;
+            helper.addNumericRefinement('ModelYearNumeric', '>=', boatFilter.yearStart);
+            helper.addNumericRefinement('ModelYearNumeric', '<=', boatFilter.yearEnd);
+        }
+
+        //price range
+        if (boatFilter.priceStart
+                && !isNaN(boatFilter.priceStart)
+                && boatFilter.priceStart != 0
+                && !isNaN(boatFilter.priceEnd)
+                && !isNaN(boatFilter.priceEnd)
+                && boatFilter.priceEnd != 0) {
+
+            helper.addNumericRefinement('PriceNumeric', '>=', boatFilter.priceStart);
+            helper.addNumericRefinement('PriceNumeric', '<=', boatFilter.priceEnd);
+        }
+
+        //length range
+        if (boatFilter.lengthStart
+                && !isNaN(boatFilter.lengthStart)
+                && boatFilter.lengthStart != 0
+                && !isNaN(boatFilter.lengthEnd)
+                && !isNaN(boatFilter.lengthEnd)
+                && boatFilter.lengthEnd != 0) {
+
+            helper.addNumericRefinement('LengthNumeric', '>=', boatFilter.lengthStart);
+            helper.addNumericRefinement('LengthNumeric', '<=', boatFilter.lengthEnd);
+        }
     }
 
     function setCallback(callback) {
@@ -135,6 +189,15 @@ MarineMax.BoatRepository = function () {
             fuelTypeFacets: [],
             boatTypeFacets: [],
 
+            yearStart : 0,
+            yearEnd : 0,
+            priceStart: 0,
+            priceEnd: 0,
+            lengthStart: 0,
+            lengthEnd: 0,
+
+            keyword: null,
+
             //Dealer ID: The list of makes will follow all franchise rules and will 
             //have the 4 exception brands
             dealerId: null,
@@ -143,7 +206,9 @@ MarineMax.BoatRepository = function () {
             radiusInMiles: 0,
 
             pageNumber: 0,
-            recordsPerPage: 2
+            recordsPerPage: 2,
+
+
         };
     }
 
@@ -153,5 +218,5 @@ MarineMax.BoatRepository = function () {
         setCallback: setCallback,
         getInventoryWithRefinements: getInventoryWithRefinements,
         BoatFilter: BoatFilter
-};
+    };
 }();
