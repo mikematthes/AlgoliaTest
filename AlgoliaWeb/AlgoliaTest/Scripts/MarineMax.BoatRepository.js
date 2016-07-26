@@ -11,8 +11,8 @@ MarineMax.BoatRepository = function () {
         var client = algoliasearch("MES124X9KA", "36184839ca046b3bbeed7d2b4f088e8b");
 
         var params = {
-            facets: ['DealerId', 'modelLocationIDs'],
-            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType'],
+            facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
+            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
             //aroundLatLng: "0,0"
@@ -165,7 +165,13 @@ MarineMax.BoatRepository = function () {
                     helper.addDisjunctiveFacetRefinement('MasterBoatClassType', boatFilter.boatTypeFacets[index]);
                 }
             }
-            if(boatFilter.dealerId
+            if (boatFilter.lifestyleFacet) {
+                helper.addDisjunctiveFacetRefinement('LifestyleList', boatFilter.lifestyleFacet);
+            }
+            if (boatFilter.promotional) {
+                helper.addFacetRefinement("PromotionalBoat", true);
+            }
+            if (boatFilter.dealerId
                     && !isNaN(boatFilter.dealerId)
                     && boatFilter.dealerId != 0) {
 
@@ -191,6 +197,9 @@ MarineMax.BoatRepository = function () {
             fuelTypeFacets: [],
             boatTypeFacets: [],
 
+            //only allow a single lifestyle to be selected when going to FAB from a lifestyle page
+            lifestyleFacet: null,
+
             yearStart : 0,
             yearEnd : 0,
             priceStart: 0,
@@ -201,6 +210,7 @@ MarineMax.BoatRepository = function () {
             //Make, Model, PrimaryBoatClass, SecondaryBoatClassList, _tags, 
             //StockNumber, PriceNumeric, ModelYearNumeric, LengthNumeric
             keyword: null,
+            promotional: false,
 
             //Dealer ID: The list of makes will follow all franchise rules and will 
             //have the 4 exception brands

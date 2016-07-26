@@ -24,6 +24,8 @@ function MakesCallback(data)
     showCondition(data);
     showBoatTypes(data);
     showFuelTypes(data);
+    showLifestyleTypes(data);
+    showPromotions(data);
 
     showHits(data);
 }
@@ -193,6 +195,66 @@ function addBoatTypeFilter(theCheckbox) {
 
     addOtherFiltersAndGetResults(mmFilter);
 }
+
+
+
+
+
+/*
+############
+Lifestyle
+############
+*/
+function showLifestyleTypes(data) {
+    $("#spLifestyleTypes").empty();
+    if (data.disjunctiveFacets.length < 6) return;
+
+    for (var s in data.disjunctiveFacets[5].data) {
+        $("#spLifestyleTypes").append('<li><input class="chkLifestyleTypes" name="chkLifestyleTypes" type="checkbox" value="'
+            + s + '" />'
+            + s
+            + '(' + data.disjunctiveFacets[5].data[s]
+            + ')</li>');
+    }
+
+    $('.chkLifestyleTypes').change(function () {
+        addLifestyleFilter(this);
+    });
+}
+
+function addLifestyleFilter(theCheckbox) {
+    $('input[name=chkLifestyleTypes]:checked').each(function () {
+        mmFilter.lifestyleFacet = $(this).val();
+    });
+
+    addOtherFiltersAndGetResults(mmFilter);
+}
+
+
+
+
+
+/*
+############
+Promotions
+############
+*/
+function showPromotions(data) {
+    $('#chkPromotional').change(function () {
+        addPromotionFilter(this);
+    });
+}
+
+function addPromotionFilter(theCheckbox) {
+    if (theCheckbox.value == 'True') {
+        mmFilter.promotional = true;
+    }
+        
+    addOtherFiltersAndGetResults(mmFilter);
+}
+
+
+
 
 
 
