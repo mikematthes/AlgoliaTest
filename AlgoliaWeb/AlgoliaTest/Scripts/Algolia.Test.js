@@ -213,6 +213,7 @@ function addOtherFiltersAndGetResults()
     mmFilter.lengthStart = $('#txtLengthStart').val();
     mmFilter.lengthEnd = $('#txtLengthEnd').val();
     mmFilter.keyword = $('#txtKeyword').val();
+    mmFilter.dealerId = $('#txtDealerId').val();
 
     repo.getInventoryWithRefinements(mmFilter);
 }

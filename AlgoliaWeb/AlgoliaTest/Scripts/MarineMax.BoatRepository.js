@@ -11,7 +11,7 @@ MarineMax.BoatRepository = function () {
         var client = algoliasearch("MES124X9KA", "36184839ca046b3bbeed7d2b4f088e8b");
 
         var params = {
-            facets: ['DealerId'],
+            facets: ['DealerId', 'modelLocationIDs'],
             disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
@@ -24,7 +24,7 @@ MarineMax.BoatRepository = function () {
 
         addRangeRefinements(helper, boatFilter);
 
-        //helper.addFacetRefinement("DealerId", "44117")
+        //helper.addFacetRefinement("modelLocationIDs", "44227")
         //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
 
         return helper;
@@ -165,10 +165,12 @@ MarineMax.BoatRepository = function () {
                     helper.addDisjunctiveFacetRefinement('MasterBoatClassType', boatFilter.boatTypeFacets[index]);
                 }
             }
+            if(boatFilter.dealerId
+                    && !isNaN(boatFilter.dealerId)
+                    && boatFilter.dealerId != 0) {
 
-            //TODO: Add dealer ID filter
-
-
+                helper.addFacetRefinement("modelLocationIDs", boatFilter.dealerId)
+            }
         }
 
         helper.on('result', theCallback);
@@ -196,6 +198,8 @@ MarineMax.BoatRepository = function () {
             lengthStart: 0,
             lengthEnd: 0,
 
+            //Make, Model, PrimaryBoatClass, SecondaryBoatClassList, _tags, 
+            //StockNumber, PriceNumeric, ModelYearNumeric, LengthNumeric
             keyword: null,
 
             //Dealer ID: The list of makes will follow all franchise rules and will 
