@@ -11,7 +11,7 @@ MarineMax.BoatRepository = function () {
         var client = algoliasearch("MES124X9KA", "36184839ca046b3bbeed7d2b4f088e8b");
 
         var params = {
-            facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
+            facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat', 'LocationsBrandSold'],
             disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
@@ -24,6 +24,7 @@ MarineMax.BoatRepository = function () {
 
         addRangeRefinements(helper, boatFilter);
 
+        //helper.addFacetRefinement("LocationsBrandSold", "44089")
         //helper.addFacetRefinement("modelLocationIDs", "44227")
         //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
 
