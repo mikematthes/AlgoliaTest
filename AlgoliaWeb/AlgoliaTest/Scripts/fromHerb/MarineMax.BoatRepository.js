@@ -5,8 +5,8 @@ var MarineMax = MarineMax || {};
 
 MarineMax.BoatRepository = function () {
     var theCallback;
-    var currentStoreId = 0;
-    var franchiseMakes = [];
+    var defaultDealerId = 44103;
+
 
     function getAlgoliaHelper(boatFilter) {
         var client = algoliasearch("MES124X9KA", "36184839ca046b3bbeed7d2b4f088e8b");
@@ -14,18 +14,17 @@ MarineMax.BoatRepository = function () {
         var params = {
             facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
             disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList'],
-            //hitsPerPage: 2
-            //aroundRadius: 120000,
-            //aroundLatLng: "0,0"
+            hitsPerPage: 10,
+            aroundRadius: 10000,
+            //aroundLatLng: "27.9658530,-82.8001030"
         };
 
         addFilters(params, boatFilter);
 
-        var helper = algoliasearchHelper(client, 'MarineMaxSearchInventory-Dev-HS-Length-Desc', params);
+        var helper = algoliasearchHelper(client, 'MarineMaxSearchInventory-Dev-HS-Brand-Asc', params);
 
         addRangeRefinements(helper, boatFilter);
 
-        //helper.addFacetRefinement("LocationsBrandSold", "44089")
         //helper.addFacetRefinement("modelLocationIDs", "44227")
         //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
 
@@ -62,13 +61,8 @@ MarineMax.BoatRepository = function () {
                 params.query = boatFilter.keyword;
             }
 
-            //dealer id
-            if (boatFilter.dealerId
-                    && !isNaN(boatFilter.dealerId)
-                    && boatFilter.dealerId != 0) {
-
-                params.filters = 'LocationsBrandSold: ' + boatFilter.dealerId;
-            }
+            //////////// Adds a filter so only stores listed in the LocationsBrandSold list will be pulled back
+            params.filters = 'LocationsBrandSold: ' + defaultDealerId;
         }
         else {
             //default params
@@ -126,22 +120,6 @@ MarineMax.BoatRepository = function () {
         }
     }
 
-    function interceptCallback(data) {
-        //add logging
-        console.log('here');
-
-        PostProcessAlgoliaResults(data);
-
-        theCallback(data);
-    }
-
-    function PostProcessAlgoliaResults(data)
-    {
-        var x = data.disjunctiveFacets[0].data;
-        data.MarineMaxMakes = [{ 'mike': 25 }, { 'ocean alexander': 55 }];
-        var xx = "";
-    }
-
     //Info:    The list of makes will include all makes for all boats
     //Returns: standard json object that is returned from Algolia
     function getNationalInventory(recordsPerPage, pageNumber) {
@@ -152,7 +130,7 @@ MarineMax.BoatRepository = function () {
         boatFilter.pageNumber = pageNumber;
 
         var helper = getAlgoliaHelper(boatFilter);
-        helper.on('result', interceptCallback);
+        helper.on('result', theCallback);
         helper.search();
     }
 
@@ -197,17 +175,15 @@ MarineMax.BoatRepository = function () {
             if (boatFilter.promotional) {
                 helper.addFacetRefinement("PromotionalBoat", true);
             }
-
-            /*
             if (boatFilter.dealerId
                     && !isNaN(boatFilter.dealerId)
                     && boatFilter.dealerId != 0) {
 
-                helper.addFacetRefinement("modelLocationIDs", boatFilter.dealerId)
-            }*/
+                helper.addFacetRefinement("modelLocationIDs", boatFilter.dealerId);
+            }
         }
 
-        helper.on('result', interceptCallback);
+        helper.on('result', theCallback);
         helper.search();
     }
 

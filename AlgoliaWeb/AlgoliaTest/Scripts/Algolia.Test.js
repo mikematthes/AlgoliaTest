@@ -37,13 +37,14 @@ Makes
 */
 function showMakes(data) {
     $("#spMakes").empty();
-    if (data.disjunctiveFacets.length < 1) return;
+    var facetValues = data.getFacetValues('Make');
 
-    for (var s in data.disjunctiveFacets[0].data) {
+    for (var s in facetValues) {
+        var checkedValue = facetValues[s].isRefined ? " checked" : "";
         $("#spMakes").append('<li><input class="chkMake" name="chkMake" type="checkbox" value="'
-            + s + '" />'
-            + s
-            + '(' + data.disjunctiveFacets[0].data[s]
+            + facetValues[s].name + '"' + checkedValue + ' />'
+            + facetValues[s].name
+            + '(' + facetValues[s].count
             + ')</li>');
     }
 
@@ -53,6 +54,8 @@ function showMakes(data) {
 }
 
 function addMakeFilter(theCheckbox) {
+    mmFilter.makeFacets = [];
+
     $('input[name=chkMake]:checked').each(function () {
         mmFilter.makeFacets.push($(this).val());
     });
