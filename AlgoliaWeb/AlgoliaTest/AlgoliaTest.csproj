@@ -161,7 +161,7 @@
     <Content Include="Global.asax" />
     <Content Include="Scripts\Algolia.Test.js" />
     <Content Include="Scripts\MarineMax.BoatRepository.js" />
-    <Content Include="Scripts\MarineMax.BoatRepository.Service.js" />
+    <Content Include="Scripts\MarineMax.BoatService.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

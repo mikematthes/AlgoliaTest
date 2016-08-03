@@ -3,11 +3,16 @@ var mmFilter;
 
 function start()
 {
-    repo = MarineMax.BoatRepository;
+    repo = MarineMax.BoatService;
     repo.setCallback(MakesCallback);
-    repo.getNationalInventory($('#txtRecordsPerPage').val(), $('#txtPageNumber').val());
 
     mmFilter = repo.BoatFilter();
+
+    mmFilter.recordsPerPage = $('#txtRecordsPerPage').val();
+    mmFilter.pageNumber = $('#txtPageNumber').val();
+
+    repo.getInventoryWithRefinements(mmFilter);
+
 }
 
 function refine()
