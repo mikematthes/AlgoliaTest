@@ -15,9 +15,12 @@ function start()
 
 }
 
-function refine()
-{
+function refine() {
     addOtherFiltersAndGetResults();
+}
+
+function reset() {
+    window.location.href = window.location.href;
 }
 
 function MakesCallback(data)
@@ -284,6 +287,9 @@ function addOtherFiltersAndGetResults()
     mmFilter.lengthEnd = $('#txtLengthEnd').val();
     mmFilter.keyword = $('#txtKeyword').val();
     mmFilter.dealerId = $('#txtDealerId').val();
+
+    mmFilter.sortField = $('#ddlSortField').val();
+    mmFilter.sortDirection = $('#ddlSortDirection').val();
 
     repo.getInventoryWithRefinements(mmFilter);
 }

@@ -4,12 +4,26 @@
 var MarineMax = MarineMax || {};
 
 MarineMax.BoatRepository = function () {
+    var sortingOptions = {
+        'length_asc' : 'MarineMaxSearchInventory-Dev-HS-Length-Asc',
+        'length_desc' : 'MarineMaxSearchInventory-Dev-HS-Length-Desc',
+        'brand_asc' : 'MarineMaxSearchInventory-Dev-HS-Brand-Asc',
+        'brand_desc' : 'MarineMaxSearchInventory-Dev-HS-Brand-Desc',
+        'year_asc' : 'MarineMaxSearchInventory-Dev-HS-Year-Asc',
+        'year_desc' : 'MarineMaxSearchInventory-Dev-HS-Year-Desc',
+        'price_asc' : 'MarineMaxSearchInventory-Dev-HS-Price-Asc',
+        'price_desc': 'MarineMaxSearchInventory-Dev-HS-Price-Desc',
+        'default': 'MarineMaxSearchInventory-Dev-HS-Length-Desc'
+    };
+
+    algoliaService = MarineMax.Algolia;
+
     function getAlgoliaHelper(boatFilter) {
-        var client = algoliasearch("MES124X9KA", "36184839ca046b3bbeed7d2b4f088e8b");
+        var client = algoliaService.getClient();
 
         var params = {
             facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
-            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList'],
+            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
             //aroundLatLng: "0,0"
@@ -17,7 +31,7 @@ MarineMax.BoatRepository = function () {
 
         addFilters(params, boatFilter);
 
-        var helper = algoliasearchHelper(client, 'MarineMaxSearchInventory-Dev-HS-Length-Desc', params);
+        var helper = algoliasearchHelper(client, getSortingOption(boatFilter), params);
 
         addRangeRefinements(helper, boatFilter);
 
@@ -26,6 +40,18 @@ MarineMax.BoatRepository = function () {
         //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
 
         return helper;
+    }
+
+    function getSortingOption(boatFilter){
+        var sortKey = boatFilter.sortField + "_" + boatFilter.sortDirection;
+
+        var sortField = sortingOptions[sortKey];
+
+        if (!sortField) {
+            sortField = sortingOptions['default'];
+        }
+
+        return sortField;
     }
 
     function addFilters(params, boatFilter) {

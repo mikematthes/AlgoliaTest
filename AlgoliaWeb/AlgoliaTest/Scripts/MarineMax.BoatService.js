@@ -148,7 +148,13 @@ MarineMax.BoatService = function () {
             radiusInMiles: 0,
 
             pageNumber: 0,
-            recordsPerPage: 2,
+            recordsPerPage: 12,
+
+            //length | brand | year | price
+            sortField: 'length',
+
+            //asc | desc
+            sortDirection : 'desc'
         };
     }
 
