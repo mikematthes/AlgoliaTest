@@ -79,18 +79,28 @@ MarineMax.BoatService = function () {
         theCallback(data);
     }
 
+    //Make sure all NEW makes are in the full list of Make facets
     function PostProcessAlgoliaResults(data) {
         data.MarineMaxMakes = data.getFacetValues('Make');
 
+        //Add NEW makes to the currently list of makes returned by Algolia
         for (var theIndex in allNewMakesForCurrentDealer) {
             if (!isExistsByName(data.MarineMaxMakes, allNewMakesForCurrentDealer[theIndex].name)) {
                 data.MarineMaxMakes.push({ name: allNewMakesForCurrentDealer[theIndex].name, isRefined: false, count: 0 });
             }
         }
 
-        var x = "";
+        //sort the list of makes
+        data.MarineMaxMakes.sort(function (a,b) {
+            if (a.name.toLowerCase() < b.name.toLowerCase())
+                return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase())
+                return 1;
+            return 0;
+        });
     }
 
+    //Check whether a Make exists in the list of Makes returned from Algolia
     function isExistsByName(makesArray, key)
     {
         var isExists = false;
@@ -103,6 +113,8 @@ MarineMax.BoatService = function () {
 
         return isExists;
     }
+
+
 
     //This object needs to be sent to getInventoryWithRefinements
     function BoatFilter() {
