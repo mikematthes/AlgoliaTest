@@ -110,7 +110,7 @@ MarineMax.BoatRepository = function () {
     //Retrieves inventory from Algolia with the applied facets defined in boatFilter
     //boatFilter: Create this object like this: 
     //              var bf = MarineMax.BoatFilter();
-    function getInventoryWithRefinements(boatFilter, callback)
+    function getInventoryWithRefinements(boatFilter)
     {
         var helper = getAlgoliaHelper(boatFilter);
 
@@ -148,8 +148,22 @@ MarineMax.BoatRepository = function () {
             }
         }
 
-        helper.on('result', callback);
+        var deferred = $.Deferred();
+
+
+        helper.on('result', function (data) {
+            if (data) {
+                deferred.resolve(data);
+            }
+            else {
+                deferred.reject("error calling algolia");
+            }
+
+        });
+
         helper.search();
+        
+        return deferred.promise();
     }
 
     function convertMilesToMeters(numMiles) {

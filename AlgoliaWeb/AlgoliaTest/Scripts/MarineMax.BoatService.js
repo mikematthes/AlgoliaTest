@@ -3,19 +3,62 @@
 
 var MarineMax = MarineMax || {};
 
+var theCallback;
+var currentDealerId = 0;
+var allNewMakesForCurrentDealer = [];
+
 MarineMax.BoatService = function () {
-    var theCallback;
-    var currentStoreId = 0;
-    var franchiseMakes = [];
+    var _boatFilter = null;
 
     //Retrieves inventory from Algolia with the applied facets defined in boatFilter
     //boatFilter: Create this object like this: 
     //              var bf = MarineMax.BoatFilter();
     function getInventoryWithRefinements(boatFilter) {
+        _boatFilter = boatFilter;
         verifyCallback();
 
+        var paramDealerId = boatFilter.dealerId;
+        paramDealerId = (boatFilter.dealerId == null || boatFilter.dealerId < 1) ? -1 : boatFilter.dealerId;
+
+        //If a new dealer ID is requested, then get all new makes
+        if (paramDealerId
+                && !isNaN(paramDealerId)
+                && paramDealerId != currentDealerId) {
+
+            //get new makes from Algolia
+            var mmFilter = BoatFilter();
+
+            //if dealer id is 0, then getting national inventory
+            if (paramDealerId != -1) {
+                mmFilter.dealerId = boatFilter.dealerId;
+            }
+
+            currentDealerId = paramDealerId;
+            mmFilter.conditionFacets.push("New");
+
+            var repo = MarineMax.BoatRepository;
+            repo.getInventoryWithRefinements(mmFilter).then(saveNewMakes, function () { throw "Algolia call failed"; });
+            console.log("done calling all NEW makes");
+        }
+        else {
+            runAlgoliaQuery();
+        }
+    }
+
+    function runAlgoliaQuery() {
+        //run standard search based on the queries sent from client
         var repo = MarineMax.BoatRepository;
-        repo.getInventoryWithRefinements(boatFilter, interceptCallback);
+        //repo.getInventoryWithRefinements(boatFilter, interceptCallback);
+        repo.getInventoryWithRefinements(_boatFilter).then(interceptCallback, function () { throw "Algolia call failed"; });
+    }
+
+    function saveNewMakes(data) {
+        console.log("saving NEW makes");
+        allNewMakesForCurrentDealer = data.getFacetValues('Make');
+        allNewMakesForCurrentDealer.push({ count:222, isRefined: false, name: "mike" });
+        console.log("Current dealer and quantity of NEW makes: " + currentDealerId + "," + allNewMakesForCurrentDealer.length)
+
+        runAlgoliaQuery();
     }
 
     function setCallback(callback) {
@@ -29,15 +72,36 @@ MarineMax.BoatService = function () {
     }
 
     function interceptCallback(data) {
+        console.log("Post processing makes");
+
         PostProcessAlgoliaResults(data);
 
         theCallback(data);
     }
 
     function PostProcessAlgoliaResults(data) {
-        var x = data.disjunctiveFacets[0].data;
-        data.MarineMaxMakes = [{ 'mike': 25 }, { 'ocean alexander': 55 }];
-        var xx = "";
+        data.MarineMaxMakes = data.getFacetValues('Make');
+
+        for (var theIndex in allNewMakesForCurrentDealer) {
+            if (!isExistsByName(data.MarineMaxMakes, allNewMakesForCurrentDealer[theIndex].name)) {
+                data.MarineMaxMakes.push({ name: allNewMakesForCurrentDealer[theIndex].name, isRefined: false, count: 0 });
+            }
+        }
+
+        var x = "";
+    }
+
+    function isExistsByName(makesArray, key)
+    {
+        var isExists = false;
+        for (var theIndex in makesArray) {
+            if (makesArray[theIndex].name == key) {
+                isExists = true;
+                break;
+            }
+        }
+
+        return isExists;
     }
 
     //This object needs to be sent to getInventoryWithRefinements
