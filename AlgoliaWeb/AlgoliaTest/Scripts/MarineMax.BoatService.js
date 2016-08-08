@@ -150,11 +150,8 @@ MarineMax.BoatService = function () {
             pageNumber: 0,
             recordsPerPage: 12,
 
-            //length | brand | year | price
-            sortField: 'length',
-
-            //asc | desc
-            sortDirection : 'desc'
+            // should match key in sortingOptions in BoatRepository
+            sortIndex: 'default'
         };
     }
 

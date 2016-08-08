@@ -5,14 +5,14 @@ var MarineMax = MarineMax || {};
 
 MarineMax.BoatRepository = function () {
     var sortingOptions = {
-        'length_asc' : 'MarineMaxSearchInventory-Dev-HS-Length-Asc',
-        'length_desc' : 'MarineMaxSearchInventory-Dev-HS-Length-Desc',
-        'brand_asc' : 'MarineMaxSearchInventory-Dev-HS-Brand-Asc',
-        'brand_desc' : 'MarineMaxSearchInventory-Dev-HS-Brand-Desc',
-        'year_asc' : 'MarineMaxSearchInventory-Dev-HS-Year-Asc',
-        'year_desc' : 'MarineMaxSearchInventory-Dev-HS-Year-Desc',
-        'price_asc' : 'MarineMaxSearchInventory-Dev-HS-Price-Asc',
-        'price_desc': 'MarineMaxSearchInventory-Dev-HS-Price-Desc',
+        'AscendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Asc',
+        'DescendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Desc',
+        'AscendingByBrand': 'MarineMaxSearchInventory-Dev-HS-Brand-Asc',
+        'DescendingByBrand': 'MarineMaxSearchInventory-Dev-HS-Brand-Desc',
+        'AscendingByYear': 'MarineMaxSearchInventory-Dev-HS-Year-Asc',
+        'DescendingByYear': 'MarineMaxSearchInventory-Dev-HS-Year-Desc',
+        'AscendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Asc',
+        'DescendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Desc',
         'default': 'MarineMaxSearchInventory-Dev-HS-Length-Desc'
     };
 
@@ -42,9 +42,7 @@ MarineMax.BoatRepository = function () {
     }
 
     function getSortingOption(boatFilter){
-        var sortKey = boatFilter.sortField + "_" + boatFilter.sortDirection;
-
-        var sortField = sortingOptions[sortKey];
+        var sortField = sortingOptions[boatFilter.sortIndex];
 
         if (!sortField) {
             sortField = sortingOptions['default'];

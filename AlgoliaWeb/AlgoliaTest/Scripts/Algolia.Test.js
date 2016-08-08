@@ -288,8 +288,7 @@ function addOtherFiltersAndGetResults()
     mmFilter.keyword = $('#txtKeyword').val();
     mmFilter.dealerId = $('#txtDealerId').val();
 
-    mmFilter.sortField = $('#ddlSortField').val();
-    mmFilter.sortDirection = $('#ddlSortDirection').val();
+    mmFilter.sortIndex = $('#ddlSortOption').val();
 
     repo.getInventoryWithRefinements(mmFilter);
 }
