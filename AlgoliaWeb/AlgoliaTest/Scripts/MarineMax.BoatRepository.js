@@ -32,6 +32,7 @@ MarineMax.BoatRepository = function () {
 
         addFilters(params, boatFilter);
         var helper = algoliasearchHelper(client, getSortingOption(boatFilter), params);
+
         addRangeRefinements(helper, boatFilter);
 
         //helper.addFacetRefinement("LocationsBrandSold", "44089")
@@ -41,7 +42,7 @@ MarineMax.BoatRepository = function () {
         return helper;
     }
 
-    function getSortingOption(boatFilter){
+    function getSortingOption(boatFilter) {
         var sortField = sortingOptions[boatFilter.sortIndex];
 
         if (!sortField) {
@@ -57,16 +58,17 @@ MarineMax.BoatRepository = function () {
             if ($.isNumeric(boatFilter.latitude)
                     && $.isNumeric(boatFilter.longitude)) {
                 params.aroundLatLng = boatFilter.latitude + "," + boatFilter.longitude;
-
-                //Set a huge default radius so get all boats for the current location
-                //if a smaller radius is set, it will be applied below
-                params.aroundRadius = convertMilesToMeters(12500);
             }
 
             //radius
             if ($.isNumeric(boatFilter.radiusInMiles)
                     && boatFilter.radiusInMiles > 0) {
                 params.aroundRadius = convertMilesToMeters(boatFilter.radiusInMiles);
+            }
+
+            //model boats
+            if (!boatFilter.showModelBoats) {
+                params.filters = 'NOT _tags: MODEL_BOAT';
             }
 
             //records per page
@@ -83,7 +85,14 @@ MarineMax.BoatRepository = function () {
             if ($.isNumeric(boatFilter.dealerId)
                     && boatFilter.dealerId != 0) {
 
-                params.filters = 'LocationsBrandSold: ' + boatFilter.dealerId;
+                if (params.filters) {
+                    params.filters += " AND ";
+                }
+                else {
+                    params.filters = "";
+                }
+
+                params.filters += 'LocationsBrandSold: ' + boatFilter.dealerId;
             }
         }
     }
@@ -147,8 +156,7 @@ MarineMax.BoatRepository = function () {
     //Retrieves inventory from Algolia with the applied facets defined in boatFilter
     //boatFilter: Create this object like this: 
     //              var bf = MarineMax.BoatFilter();
-    function getInventoryWithRefinements(boatFilter)
-    {
+    function getInventoryWithRefinements(boatFilter) {
         var helper = getAlgoliaHelper(boatFilter);
 
         if (boatFilter) {
@@ -198,8 +206,9 @@ MarineMax.BoatRepository = function () {
 
         });
 
+
         helper.setPage(getPageFilter(boatFilter)).search();
-        
+
         return deferred.promise();
     }
 

@@ -16,25 +16,29 @@ MarineMax.BoatService = function () {
     function getInventoryWithRefinements(boatFilter) {
         _boatFilter = boatFilter;
         verifyCallback();
+        handleRadius();
 
         var paramDealerId = boatFilter.dealerId;
+
+        //initialize paramDealerId to -1 so the first call gets made for NEW makes
         paramDealerId = (boatFilter.dealerId == null || boatFilter.dealerId < 1) ? -1 : boatFilter.dealerId;
 
         //If a new dealer ID is requested, then get all new makes
         if (paramDealerId
-                && !isNaN(paramDealerId)
+                && $.isNumeric(paramDealerId)
                 && paramDealerId != currentDealerId) {
 
             //get new makes from Algolia
             var mmFilter = BoatFilter();
+            mmFilter.showModelBoats = true;
+            mmFilter.conditionFacets.push("New");
 
-            //if dealer id is 0, then getting national inventory
+            //if paramDealerId is -1, then getting national inventory
             if (paramDealerId != -1) {
                 mmFilter.dealerId = boatFilter.dealerId;
             }
 
             currentDealerId = paramDealerId;
-            mmFilter.conditionFacets.push("New");
 
             var repo = MarineMax.BoatRepository;
             repo.getInventoryWithRefinements(mmFilter).then(saveNewMakes, function () { throw "Algolia call failed"; });
@@ -43,6 +47,47 @@ MarineMax.BoatService = function () {
         else {
             runAlgoliaQuery();
         }
+    }
+
+    function handleRadius() {
+
+        //if searching by store, don't show model boats by default
+        if (_boatFilter.dealerId) {
+            _boatFilter.showModelBoats = false;
+        }
+        else {
+            _boatFilter.showModelBoats = true;
+        }
+
+        //make sure radius is not sent when lat/long missing
+        if (!($.isNumeric(_boatFilter.latitude)
+                && $.isNumeric(_boatFilter.longitude))) {
+
+            _boatFilter.radiusInMiles = null;
+            _boatFilter.showModelBoats = true;
+        }
+
+        //If radius is null and lat/long provided, then show "national" inventory
+        if (!_boatFilter.radiusInMiles
+                && $.isNumeric(_boatFilter.latitude)
+                && $.isNumeric(_boatFilter.longitude)) {
+
+            _boatFilter.radiusInMiles = 12500;
+            _boatFilter.showModelBoats = true;
+        }
+        //if radius is 0 and lat/long provided, then show "this store only"
+        else if ($.isNumeric(_boatFilter.radiusInMiles)
+                && _boatFilter.radiusInMiles == 0
+                && $.isNumeric(_boatFilter.latitude)
+                && $.isNumeric(_boatFilter.longitude)) {
+
+            _boatFilter.radiusInMiles = null;
+            _boatFilter.latitude = null;
+            _boatFilter.longitude = null;
+        }
+
+        //default case is to allow the passed in lat/long and radius
+        //which performs a standard radius search without model boats
     }
 
     function runAlgoliaQuery() {
@@ -143,15 +188,20 @@ MarineMax.BoatService = function () {
             //Dealer ID: The list of makes will follow all franchise rules and will 
             //have the 4 exception brands
             dealerId: null,
-            latitude: 0,
-            longitude: 0,
-            radiusInMiles: 0,
+            latitude: null,
+            longitude: null,
+
+            //0 means "just this store"
+            //null means "national inventory"
+            radiusInMiles: null,
 
             pageNumber: 0,
             recordsPerPage: 12,
 
             // should match key in sortingOptions in BoatRepository
-            sortIndex: 'default'
+            sortIndex: 'default',
+
+            showModelBoats: false
         };
     }
 
