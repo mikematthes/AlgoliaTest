@@ -92,7 +92,14 @@ MarineMax.BoatRepository = function () {
                     params.filters = "";
                 }
 
-                params.filters += 'LocationsBrandSold: ' + boatFilter.dealerId;
+                if (boatFilter.thisStoreOnly) {
+                    //this field lists all boats that this dealer has in store
+                    params.filters += 'DealerId: ' + boatFilter.dealerId;
+                }
+                else {
+                    //this field lists all boats this dealer is allowed to sell
+                    params.filters += 'LocationsBrandSold: ' + boatFilter.dealerId;
+                }
             }
         }
     }

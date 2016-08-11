@@ -51,6 +51,45 @@ MarineMax.BoatService = function () {
 
     function handleRadius() {
 
+        //regular radius search within x miles
+        if (isRadiusSearchWithMiles()) {
+            console.log('Radius search with miles > 0')
+            _boatFilter.showModelBoats = false;
+            _boatFilter.thisStoreOnly = false;
+        }
+
+        //This store only search
+        else if (isRadiusSearchWithZeroMiles()) {
+            console.log('Radius search with miles = 0')
+            _boatFilter.showModelBoats = false;
+            _boatFilter.thisStoreOnly = true;
+            _boatFilter.radiusInMiles = null;
+            _boatFilter.latitude = null;
+            _boatFilter.longitude = null;
+        }
+
+        //National inventory search
+        else if (isRadiusSearchWithNullMiles()) {
+            console.log('Radius search with NULL miles')
+            _boatFilter.showModelBoats = true;
+            _boatFilter.thisStoreOnly = false;
+            _boatFilter.radiusInMiles = 12500;
+        }
+
+        //regular search
+        else {
+            console.log('Not a radius search')
+            _boatFilter.showModelBoats = true;
+            _boatFilter.thisStoreOnly = false;
+            _boatFilter.radiusInMiles = null;
+            _boatFilter.latitude = null;
+            _boatFilter.longitude = null;
+        }
+
+
+        /*
+        _boatFilter.thisStoreOnly = false;
+
         //if searching by store, don't show model boats by default
         if (_boatFilter.dealerId) {
             _boatFilter.showModelBoats = false;
@@ -84,11 +123,56 @@ MarineMax.BoatService = function () {
             _boatFilter.radiusInMiles = null;
             _boatFilter.latitude = null;
             _boatFilter.longitude = null;
+            _boatFilter.thisStoreOnly = true;
         }
 
         //default case is to allow the passed in lat/long and radius
         //which performs a standard radius search without model boats
+        */
     }
+
+    function isRadiusSearchWithMiles() {
+        if (_boatFilter.dealerId
+            && $.isNumeric(_boatFilter.latitude)
+            && $.isNumeric(_boatFilter.longitude)
+            && $.isNumeric(_boatFilter.radiusInMiles)
+            && _boatFilter.radiusInMiles > 0) {
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function isRadiusSearchWithZeroMiles() {
+        if (_boatFilter.dealerId
+            && $.isNumeric(_boatFilter.latitude)
+            && $.isNumeric(_boatFilter.longitude)
+            && $.isNumeric(_boatFilter.radiusInMiles)
+            && _boatFilter.radiusInMiles == 0) {
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function isRadiusSearchWithNullMiles() {
+        if (_boatFilter.dealerId
+            && $.isNumeric(_boatFilter.latitude)
+            && $.isNumeric(_boatFilter.longitude)
+            && !$.isNumeric(_boatFilter.radiusInMiles)) {
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
 
     function runAlgoliaQuery() {
         //run standard search based on the queries sent from client
