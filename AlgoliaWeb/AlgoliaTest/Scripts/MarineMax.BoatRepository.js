@@ -5,6 +5,18 @@ var MarineMax = MarineMax || {};
 
 MarineMax.BoatRepository = function () {
     var sortingOptions = {
+        'AscendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Asc',
+        'DescendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc',
+        'AscendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Asc',
+        'DescendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Desc',
+        'AscendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Asc',
+        'DescendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Desc',
+        'AscendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Asc',
+        'DescendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Desc',
+        'default': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc'
+    };
+
+    /*
         'AscendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Asc',
         'DescendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Desc',
         'AscendingByBrand': 'MarineMaxSearchInventory-Dev-HS-Brand-Asc',
@@ -14,8 +26,17 @@ MarineMax.BoatRepository = function () {
         'AscendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Asc',
         'DescendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Desc',
         'default': 'MarineMaxSearchInventory-Dev-HS-Length-Desc'
-    };
 
+        'AscendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Asc',
+        'DescendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc',
+        'AscendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Asc',
+        'DescendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Desc',
+        'AscendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Asc',
+        'DescendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Desc',
+        'AscendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Asc',
+        'DescendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Desc',
+        'default': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc'
+    */
     algoliaService = MarineMax.Algolia;
 
     function getAlgoliaHelper(boatFilter) {
@@ -94,7 +115,7 @@ MarineMax.BoatRepository = function () {
 
                 if (boatFilter.thisStoreOnly) {
                     //this field lists all boats that this dealer has in store
-                    params.filters += 'DealerId: ' + boatFilter.dealerId;
+                    params.filters += 'DealerId: ' + boatFilter.dealerId + ' AND NOT StockNumberSearch: UNKNOWN';
                 }
                 else {
                     //this field lists all boats this dealer is allowed to sell

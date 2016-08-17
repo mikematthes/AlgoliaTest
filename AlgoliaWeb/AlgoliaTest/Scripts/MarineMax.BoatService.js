@@ -85,50 +85,6 @@ MarineMax.BoatService = function () {
             _boatFilter.latitude = null;
             _boatFilter.longitude = null;
         }
-
-
-        /*
-        _boatFilter.thisStoreOnly = false;
-
-        //if searching by store, don't show model boats by default
-        if (_boatFilter.dealerId) {
-            _boatFilter.showModelBoats = false;
-        }
-        else {
-            _boatFilter.showModelBoats = true;
-        }
-
-        //make sure radius is not sent when lat/long missing
-        if (!($.isNumeric(_boatFilter.latitude)
-                && $.isNumeric(_boatFilter.longitude))) {
-
-            _boatFilter.radiusInMiles = null;
-            _boatFilter.showModelBoats = true;
-        }
-
-        //If radius is null and lat/long provided, then show "national" inventory
-        if (!_boatFilter.radiusInMiles
-                && $.isNumeric(_boatFilter.latitude)
-                && $.isNumeric(_boatFilter.longitude)) {
-
-            _boatFilter.radiusInMiles = 12500;
-            _boatFilter.showModelBoats = true;
-        }
-        //if radius is 0 and lat/long provided, then show "this store only"
-        else if ($.isNumeric(_boatFilter.radiusInMiles)
-                && _boatFilter.radiusInMiles == 0
-                && $.isNumeric(_boatFilter.latitude)
-                && $.isNumeric(_boatFilter.longitude)) {
-
-            _boatFilter.radiusInMiles = null;
-            _boatFilter.latitude = null;
-            _boatFilter.longitude = null;
-            _boatFilter.thisStoreOnly = true;
-        }
-
-        //default case is to allow the passed in lat/long and radius
-        //which performs a standard radius search without model boats
-        */
     }
 
     function isRadiusSearchWithMiles() {
@@ -184,7 +140,6 @@ MarineMax.BoatService = function () {
     function saveNewMakes(data) {
         console.log("saving NEW makes");
         allNewMakesForCurrentDealer = data.getFacetValues('Make');
-        allNewMakesForCurrentDealer.push({ count:222, isRefined: false, name: "mike" });
         console.log("Current dealer and quantity of NEW makes: " + currentDealerId + "," + allNewMakesForCurrentDealer.length)
 
         runAlgoliaQuery();
