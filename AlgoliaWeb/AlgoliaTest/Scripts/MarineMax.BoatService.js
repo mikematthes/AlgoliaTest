@@ -9,11 +9,23 @@ var allNewMakesForCurrentDealer = [];
 
 MarineMax.BoatService = function () {
     var _boatFilter = null;
+    var _nationalFacets = null;
+
+    function setCallback(callback) {
+        theCallback = callback;
+    }
+
+    function verifyCallback() {
+        if (!theCallback) {
+            throw "Callback method must be set with setCallback";
+        }
+    }
 
     //Retrieves inventory from Algolia with the applied facets defined in boatFilter
     //boatFilter: Create this object like this: 
     //              var bf = MarineMax.BoatFilter();
     function getInventoryWithRefinements(boatFilter) {
+        _nationalFacets = null;
         _boatFilter = boatFilter;
         verifyCallback();
         handleRadius();
@@ -47,6 +59,14 @@ MarineMax.BoatService = function () {
         else {
             runAlgoliaQuery();
         }
+    }
+
+    function saveNewMakes(data) {
+        console.log("saving NEW makes");
+        allNewMakesForCurrentDealer = data.getFacetValues('Make');
+        console.log("Current dealer and quantity of NEW makes: " + currentDealerId + "," + allNewMakesForCurrentDealer.length)
+
+        runAlgoliaQuery();
     }
 
     function handleRadius() {
@@ -133,38 +153,81 @@ MarineMax.BoatService = function () {
     function runAlgoliaQuery() {
         //run standard search based on the queries sent from client
         var repo = MarineMax.BoatRepository;
-        //repo.getInventoryWithRefinements(boatFilter, interceptCallback);
-        repo.getInventoryWithRefinements(_boatFilter).then(interceptCallback, function () { throw "Algolia call failed"; });
+
+        //1. run national query, if necessary
+        runNationalQueryToGetFacets();
+
+        //repo.getInventoryWithRefinements(_boatFilter).then(interceptCallback, function () { throw "Algolia call failed"; });
     }
 
-    function saveNewMakes(data) {
-        console.log("saving NEW makes");
-        allNewMakesForCurrentDealer = data.getFacetValues('Make');
-        console.log("Current dealer and quantity of NEW makes: " + currentDealerId + "," + allNewMakesForCurrentDealer.length)
+    function runNationalQueryToGetFacets() {
+        var repo = MarineMax.BoatRepository;
 
-        runAlgoliaQuery();
-    }
+        if (_boatFilter.dealerId
+            && $.isNumeric(_boatFilter.latitude)
+            && $.isNumeric(_boatFilter.longitude)
+            && $.isNumeric(_boatFilter.radiusInMiles)) {
 
-    function setCallback(callback) {
-        theCallback = callback;
-    }
+            var mmFilter = BoatFilter();
+            mmFilter.conditionFacets = _boatFilter.conditionFacets;
+            mmFilter.makeFacets = _boatFilter.makeFacets;
+            mmFilter.modelFacets = _boatFilter.modelFacets;
+            mmFilter.fuelTypeFacets = _boatFilter.fuelTypeFacets;
+            mmFilter.boatTypeFacets = _boatFilter.boatTypeFacets;
+            mmFilter.lifestyleFacet = _boatFilter.lifestyleFacet;
+            mmFilter.yearStart = _boatFilter.yearStart;
+            mmFilter.yearEnd = _boatFilter.yearEnd;
+            mmFilter.priceStart = _boatFilter.priceStart;
+            mmFilter.priceEnd = _boatFilter.priceEnd;
+            mmFilter.lengthStart = _boatFilter.lengthStart;
+            mmFilter.lengthEnd = _boatFilter.lengthEnd;
+            mmFilter.keyword = _boatFilter.keyword;
+            mmFilter.promotional = _boatFilter.promotional;
+            mmFilter.dealerId = _boatFilter.dealerId;
+            mmFilter.latitude = _boatFilter.latitude;
+            mmFilter.longitude = _boatFilter.longitude;
+            mmFilter.radiusInMiles = 12500;
+            mmFilter.pageNumber = 0;
+            mmFilter.recordsPerPage = 1;
+            mmFilter.showModelBoats = _boatFilter.showModelBoats;
 
-    function verifyCallback() {
-        if (!theCallback) {
-            throw "Callback method must be set with setCallback";
+            //call national search so we can get national facets
+            repo.getInventoryWithRefinements(_boatFilter).then(interceptCallbackForNationalFacets, function () { throw "Algolia national call failed"; });
+        }
+        else {
+            //2. Call regular search
+            //call regular search so we can get results with radius
+            repo.getInventoryWithRefinements(_boatFilter).then(interceptCallback, function () { throw "Algolia call failed"; });
         }
     }
 
+    function interceptCallbackForNationalFacets(data) {
+        console.log("interceptCallbackForNationalFacets");
+
+        _nationalFacets = data;
+        var repo = MarineMax.BoatRepository;
+        repo.getInventoryWithRefinements(_boatFilter).then(interceptCallback, function () { throw "Algolia call failed"; });
+    }
+
     function interceptCallback(data) {
-        console.log("Post processing makes");
 
         PostProcessAlgoliaResults(data);
+        PostProcessNationalFacets(data, _nationalFacets);
 
         theCallback(data);
     }
 
+    function PostProcessNationalFacets(radiusResults, nationalResults) {
+        console.log('PostProcessNationalFacets');
+        if (nationalResults) {
+            console.log('National facets not null');
+        }
+    }
+
     //Make sure all NEW makes are in the full list of Make facets
     function PostProcessAlgoliaResults(data) {
+        console.log("Post processing makes");
+
         data.MarineMaxMakes = data.getFacetValues('Make');
 
         //Add NEW makes to the currently list of makes returned by Algolia
