@@ -163,11 +163,7 @@ MarineMax.BoatService = function () {
     function runNationalQueryToGetFacets() {
         var repo = MarineMax.BoatRepository;
 
-        if (_boatFilter.dealerId
-            && $.isNumeric(_boatFilter.latitude)
-            && $.isNumeric(_boatFilter.longitude)
-            && $.isNumeric(_boatFilter.radiusInMiles)) {
-
+        if (_boatFilter.dealerId) {
             var nationalFacetFilter = BoatFilter();
             nationalFacetFilter.conditionFacets = _boatFilter.conditionFacets;
             nationalFacetFilter.makeFacets = _boatFilter.makeFacets;
@@ -184,9 +180,9 @@ MarineMax.BoatService = function () {
             nationalFacetFilter.keyword = _boatFilter.keyword;
             nationalFacetFilter.promotional = _boatFilter.promotional;
             nationalFacetFilter.dealerId = _boatFilter.dealerId;
-            nationalFacetFilter.latitude = _boatFilter.latitude;
-            nationalFacetFilter.longitude = _boatFilter.longitude;
-            nationalFacetFilter.radiusInMiles = 12500;
+            nationalFacetFilter.latitude = null;
+            nationalFacetFilter.longitude = null;
+            nationalFacetFilter.radiusInMiles = null;
             nationalFacetFilter.pageNumber = 0;
             nationalFacetFilter.recordsPerPage = 1;
             nationalFacetFilter.showModelBoats = _boatFilter.showModelBoats;
@@ -226,6 +222,11 @@ MarineMax.BoatService = function () {
         if (nationalResults) {
 
             nationalResults.hits = radiusResults.hits;
+            nationalResults.nbHits = radiusResults.nbHits;
+            nationalResults.hitsPerPage = radiusResults.hitsPerPage;
+            nationalResults.nbPages = radiusResults.nbPages;
+            nationalResults.page = radiusResults.page;
+
 
             console.log('National facets not null');
         }
