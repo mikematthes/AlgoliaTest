@@ -168,31 +168,31 @@ MarineMax.BoatService = function () {
             && $.isNumeric(_boatFilter.longitude)
             && $.isNumeric(_boatFilter.radiusInMiles)) {
 
-            var mmFilter = BoatFilter();
-            mmFilter.conditionFacets = _boatFilter.conditionFacets;
-            mmFilter.makeFacets = _boatFilter.makeFacets;
-            mmFilter.modelFacets = _boatFilter.modelFacets;
-            mmFilter.fuelTypeFacets = _boatFilter.fuelTypeFacets;
-            mmFilter.boatTypeFacets = _boatFilter.boatTypeFacets;
-            mmFilter.lifestyleFacet = _boatFilter.lifestyleFacet;
-            mmFilter.yearStart = _boatFilter.yearStart;
-            mmFilter.yearEnd = _boatFilter.yearEnd;
-            mmFilter.priceStart = _boatFilter.priceStart;
-            mmFilter.priceEnd = _boatFilter.priceEnd;
-            mmFilter.lengthStart = _boatFilter.lengthStart;
-            mmFilter.lengthEnd = _boatFilter.lengthEnd;
-            mmFilter.keyword = _boatFilter.keyword;
-            mmFilter.promotional = _boatFilter.promotional;
-            mmFilter.dealerId = _boatFilter.dealerId;
-            mmFilter.latitude = _boatFilter.latitude;
-            mmFilter.longitude = _boatFilter.longitude;
-            mmFilter.radiusInMiles = 12500;
-            mmFilter.pageNumber = 0;
-            mmFilter.recordsPerPage = 1;
-            mmFilter.showModelBoats = _boatFilter.showModelBoats;
+            var nationalFacetFilter = BoatFilter();
+            nationalFacetFilter.conditionFacets = _boatFilter.conditionFacets;
+            nationalFacetFilter.makeFacets = _boatFilter.makeFacets;
+            nationalFacetFilter.modelFacets = _boatFilter.modelFacets;
+            nationalFacetFilter.fuelTypeFacets = _boatFilter.fuelTypeFacets;
+            nationalFacetFilter.boatTypeFacets = _boatFilter.boatTypeFacets;
+            nationalFacetFilter.lifestyleFacet = _boatFilter.lifestyleFacet;
+            nationalFacetFilter.yearStart = _boatFilter.yearStart;
+            nationalFacetFilter.yearEnd = _boatFilter.yearEnd;
+            nationalFacetFilter.priceStart = _boatFilter.priceStart;
+            nationalFacetFilter.priceEnd = _boatFilter.priceEnd;
+            nationalFacetFilter.lengthStart = _boatFilter.lengthStart;
+            nationalFacetFilter.lengthEnd = _boatFilter.lengthEnd;
+            nationalFacetFilter.keyword = _boatFilter.keyword;
+            nationalFacetFilter.promotional = _boatFilter.promotional;
+            nationalFacetFilter.dealerId = _boatFilter.dealerId;
+            nationalFacetFilter.latitude = _boatFilter.latitude;
+            nationalFacetFilter.longitude = _boatFilter.longitude;
+            nationalFacetFilter.radiusInMiles = 12500;
+            nationalFacetFilter.pageNumber = 0;
+            nationalFacetFilter.recordsPerPage = 1;
+            nationalFacetFilter.showModelBoats = _boatFilter.showModelBoats;
 
             //call national search so we can get national facets
-            repo.getInventoryWithRefinements(_boatFilter).then(interceptCallbackForNationalFacets, function () { throw "Algolia national call failed"; });
+            repo.getInventoryWithRefinements(nationalFacetFilter).then(interceptCallbackForNationalFacets, function () { throw "Algolia national call failed"; });
         }
         else {
             //2. Call regular search
@@ -210,16 +210,26 @@ MarineMax.BoatService = function () {
     }
 
     function interceptCallback(data) {
-
         PostProcessAlgoliaResults(data);
-        PostProcessNationalFacets(data, _nationalFacets);
-
         theCallback(data);
+        return;
+        if (_nationalFacets) {
+            PostProcessNationalFacets(data, _nationalFacets);
+            PostProcessAlgoliaResults(_nationalFacets);
+            theCallback(_nationalFacets);
+        }
+        else {
+            PostProcessAlgoliaResults(data);
+            theCallback(data);
+        }
     }
 
     function PostProcessNationalFacets(radiusResults, nationalResults) {
         console.log('PostProcessNationalFacets');
         if (nationalResults) {
+
+            nationalResults.hits = radiusResults.hits;
+
             console.log('National facets not null');
         }
     }
