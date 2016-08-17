@@ -210,9 +210,6 @@ MarineMax.BoatService = function () {
     }
 
     function interceptCallback(data) {
-        PostProcessAlgoliaResults(data);
-        theCallback(data);
-        return;
         if (_nationalFacets) {
             PostProcessNationalFacets(data, _nationalFacets);
             PostProcessAlgoliaResults(_nationalFacets);
