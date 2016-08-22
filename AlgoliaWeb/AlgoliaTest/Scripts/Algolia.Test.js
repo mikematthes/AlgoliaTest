@@ -1,6 +1,19 @@
 ﻿var repo;
 var mmFilter;
 
+/*
+keyword search fields
+
+lengthnumeric
+model
+modelyearnumeric
+pricenumeric
+stocknumber
+make
+_tags
+primaryboatclass
+secondaryboatclasslist
+*/
 function start()
 {
     repo = MarineMax.BoatService;
@@ -304,7 +317,11 @@ function showHits(data) {
             + data.hits[theHit].Make
             + ' '
             + data.hits[theHit].Model
-            + '</li>');
+            + '(Length: '
+            + data.hits[theHit].LengthOverall
+            + ' | '
+            + data.hits[theHit].objectID
+            + ')</li>');
     }
 
     $('#num-results').html(data.nbHits);

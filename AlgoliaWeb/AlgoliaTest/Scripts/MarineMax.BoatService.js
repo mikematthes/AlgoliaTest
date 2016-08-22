@@ -185,7 +185,7 @@ MarineMax.BoatService = function () {
             nationalFacetFilter.radiusInMiles = null;
             nationalFacetFilter.pageNumber = 0;
             nationalFacetFilter.recordsPerPage = 1;
-            nationalFacetFilter.showModelBoats = _boatFilter.showModelBoats;
+            nationalFacetFilter.showModelBoats = true;
 
             //call national search so we can get national facets
             repo.getInventoryWithRefinements(nationalFacetFilter).then(interceptCallbackForNationalFacets, function () { throw "Algolia national call failed"; });
@@ -238,6 +238,7 @@ MarineMax.BoatService = function () {
 
         data.MarineMaxMakes = data.getFacetValues('Make');
 
+        /*
         //Add NEW makes to the currently list of makes returned by Algolia
         for (var theIndex in allNewMakesForCurrentDealer) {
             if (!isExistsByName(data.MarineMaxMakes, allNewMakesForCurrentDealer[theIndex].name)) {
@@ -253,6 +254,7 @@ MarineMax.BoatService = function () {
                 return 1;
             return 0;
         });
+        */
     }
 
     //Check whether a Make exists in the list of Makes returned from Algolia

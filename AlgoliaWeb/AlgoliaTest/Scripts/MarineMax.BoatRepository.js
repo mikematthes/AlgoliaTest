@@ -44,7 +44,7 @@ MarineMax.BoatRepository = function () {
 
         var params = {
             facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
-            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric'],
+            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric', 'PriceBucket'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
             //aroundLatLng: "0,0"
@@ -236,7 +236,7 @@ MarineMax.BoatRepository = function () {
 
 
         helper.setPage(getPageFilter(boatFilter)).search();
-
+        
         return deferred.promise();
     }
 
