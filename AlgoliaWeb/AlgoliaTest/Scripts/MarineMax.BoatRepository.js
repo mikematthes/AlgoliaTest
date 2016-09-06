@@ -156,14 +156,14 @@ MarineMax.BoatRepository = function () {
         if ($.isNumeric(boatFilter.priceStart)
                 && boatFilter.priceStart != 0) {
 
-            helper.addNumericRefinement('PriceNumeric', '>=', boatFilter.priceStart);
+            helper.addNumericRefinement('PriceBucket', '>=', boatFilter.priceStart);
         }
 
         //price end
         if ($.isNumeric(boatFilter.priceEnd)
                 && boatFilter.priceEnd != 0) {
 
-            helper.addNumericRefinement('PriceNumeric', '<=', boatFilter.priceEnd);
+            helper.addNumericRefinement('PriceBucket', '<=', boatFilter.priceEnd);
         }
 
         //length start
