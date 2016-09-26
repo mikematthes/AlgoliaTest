@@ -233,6 +233,7 @@ MarineMax.BoatService = function () {
 
 
             //check whether any selected makes are missing from the results
+            //if this flag is true, the UI will expand the radius.
             nationalResults.isFacetMissingFromResults = FindFacetInResults('Make', nationalResults, radiusResults);
 
             if (!nationalResults.isFacetMissingFromResults) {
@@ -278,23 +279,35 @@ MarineMax.BoatService = function () {
 
         data.MarineMaxMakes = data.getFacetValues('Make');
 
-        /*
-        //Add NEW makes to the currently list of makes returned by Algolia
-        for (var theIndex in allNewMakesForCurrentDealer) {
-            if (!isExistsByName(data.MarineMaxMakes, allNewMakesForCurrentDealer[theIndex].name)) {
-                data.MarineMaxMakes.push({ name: allNewMakesForCurrentDealer[theIndex].name, isRefined: false, count: 0 });
-            }
-        }
 
-        //sort the list of makes
-        data.MarineMaxMakes.sort(function (a,b) {
+        //Grouping of Models
+        var makeModelDelimitedList = data.getFacetValues('MakeModelDelimited');
+        makeModelDelimitedList.sort(function (a, b) {
             if (a.name.toLowerCase() < b.name.toLowerCase())
                 return -1;
             if (a.name.toLowerCase() > b.name.toLowerCase())
                 return 1;
             return 0;
         });
-        */
+
+        var currentName = "";
+        var modelGroupList = {};
+        for (var theIndex in makeModelDelimitedList) {
+            var modelDelimited = makeModelDelimitedList[theIndex];
+            var values = modelDelimited.name.split(",");
+            var makeValue = values[0];
+            var modelValue = values[1];
+
+
+            if (currentName != makeValue) {
+                currentName = makeValue;
+                modelGroupList[currentName] = [];
+            }
+
+            modelGroupList[currentName].push(modelValue);
+        }
+
+        data.MakeModelGrouping = modelGroupList;
     }
 
     //Check whether a Make exists in the list of Makes returned from Algolia
