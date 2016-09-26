@@ -49,6 +49,13 @@ function MakesCallback(data)
     showPromotions(data);
 
     showHits(data);
+
+    if(data.isFacetMissingFromResults){
+        $('#facetsMissingFromResults').show();
+    }
+    else {
+        $('#facetsMissingFromResults').hide();
+    }
 }
 
 /*

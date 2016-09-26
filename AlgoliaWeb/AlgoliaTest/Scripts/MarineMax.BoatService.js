@@ -220,16 +220,56 @@ MarineMax.BoatService = function () {
     function PostProcessNationalFacets(radiusResults, nationalResults) {
         console.log('PostProcessNationalFacets');
         if (nationalResults) {
+            nationalResults.isFacetMissingFromResults = false;
 
+            //replace some properties on the National Results with the results from the radius query
             nationalResults.hits = radiusResults.hits;
             nationalResults.nbHits = radiusResults.nbHits;
             nationalResults.hitsPerPage = radiusResults.hitsPerPage;
             nationalResults.nbPages = radiusResults.nbPages;
-            nationalResults.page = radiusResults.page;
-
+            nationalResults.page = radiusResults.page; 
 
             console.log('National facets not null');
+
+
+            //check whether any selected makes are missing from the results
+            nationalResults.isFacetMissingFromResults = FindFacetInResults('Make', nationalResults, radiusResults);
+
+            if (!nationalResults.isFacetMissingFromResults) {
+                nationalResults.isFacetMissingFromResults = FindFacetInResults('Model', nationalResults, radiusResults);
+            }
+
+            if (!nationalResults.isFacetMissingFromResults) {
+                nationalResults.isFacetMissingFromResults = FindFacetInResults('Condition', nationalResults, radiusResults);
+            }
+
+            if (!nationalResults.isFacetMissingFromResults) {
+                nationalResults.isFacetMissingFromResults = FindFacetInResults('FuelType', nationalResults, radiusResults);
+            }
+
+            if (!nationalResults.isFacetMissingFromResults) {
+                nationalResults.isFacetMissingFromResults = FindFacetInResults('MasterBoatClassType', nationalResults, radiusResults);
+            }
         }
+    }
+
+    function FindFacetInResults(facetName, nationalResults, radiusResults)
+    {
+        var theNationalFacets = nationalResults.getFacetValues(facetName);
+        var isFacetMissingFromResults = false;
+
+        for (var theIndex in theNationalFacets) {
+            var theNationalFacet = theNationalFacets[theIndex];
+            if (theNationalFacet.isRefined
+                && !isExistsByNameWithCountGreaterThanZero(radiusResults.getFacetValues(facetName), theNationalFacet.name)) {
+
+                isFacetMissingFromResults = true;
+                console.log('##Facet missing from result list: ' + theNationalFacet.name);
+                break;
+            }
+        }
+
+        return isFacetMissingFromResults;
     }
 
     //Make sure all NEW makes are in the full list of Make facets
@@ -271,6 +311,18 @@ MarineMax.BoatService = function () {
         return isExists;
     }
 
+    function isExistsByNameWithCountGreaterThanZero(makesArray, key) {
+        var isExists = false;
+        for (var theIndex in makesArray) {
+            if (makesArray[theIndex].name == key
+                && makesArray[theIndex].count > 0) {
+                isExists = true;
+                break;
+            }
+        }
+
+        return isExists;
+    }
 
 
     //This object needs to be sent to getInventoryWithRefinements

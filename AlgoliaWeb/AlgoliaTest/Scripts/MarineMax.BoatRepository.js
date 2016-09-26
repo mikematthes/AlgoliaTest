@@ -44,7 +44,7 @@ MarineMax.BoatRepository = function () {
 
         var params = {
             facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
-            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric', 'PriceBucket'],
+            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric', 'PriceBucket', 'MakeModelDelimited'],
             //hitsPerPage: 2
             //aroundRadius: 120000,
             //aroundLatLng: "0,0"
