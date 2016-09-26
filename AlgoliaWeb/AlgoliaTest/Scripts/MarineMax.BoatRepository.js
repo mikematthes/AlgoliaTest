@@ -4,39 +4,39 @@
 var MarineMax = MarineMax || {};
 
 MarineMax.BoatRepository = function () {
-    var sortingOptions = {
-        'AscendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Asc',
-        'DescendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc',
-        'AscendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Asc',
-        'DescendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Desc',
-        'AscendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Asc',
-        'DescendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Desc',
-        'AscendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Asc',
-        'DescendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Desc',
-        'default': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc'
-    };
+    var _sortingOptions = null;
 
-    /*
-        'AscendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Asc',
-        'DescendingByLength': 'MarineMaxSearchInventory-Dev-HS-Length-Desc',
-        'AscendingByBrand': 'MarineMaxSearchInventory-Dev-HS-Brand-Asc',
-        'DescendingByBrand': 'MarineMaxSearchInventory-Dev-HS-Brand-Desc',
-        'AscendingByYear': 'MarineMaxSearchInventory-Dev-HS-Year-Asc',
-        'DescendingByYear': 'MarineMaxSearchInventory-Dev-HS-Year-Desc',
-        'AscendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Asc',
-        'DescendingByPrice': 'MarineMaxSearchInventory-Dev-HS-Price-Desc',
-        'default': 'MarineMaxSearchInventory-Dev-HS-Length-Desc'
+    //load index names from cms
+    function getIndexNames() {
+        var deferred = $.Deferred();
 
-        'AscendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Asc',
-        'DescendingByLength': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc',
-        'AscendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Asc',
-        'DescendingByBrand': 'MarineMaxSearchInventory-WWB-Stg-Brand-Desc',
-        'AscendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Asc',
-        'DescendingByYear': 'MarineMaxSearchInventory-WWB-Stg-Year-Desc',
-        'AscendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Asc',
-        'DescendingByPrice': 'MarineMaxSearchInventory-WWB-Stg-Price-Desc',
-        'default': 'MarineMaxSearchInventory-WWB-Stg-Length-Desc'
-    */
+        $.getJSON("/api/algolia/indexes", function (data) {
+            if (data) {
+                deferred.resolve(data);
+            }
+            else
+                deferred.reject("error getting search index names");
+        });
+
+        return deferred.promise();
+    }
+
+    function getSortingOptions() {
+        if (_sortingOptions == null) {
+            getIndexNames().then(function (data) {
+                _sortingOptions = data;
+
+                return _sortingOptions;
+            }, function () {
+                throw "Getting index names failed";
+            })
+        }
+        else {
+            return _sortingOptions;
+        }
+    }
+
+    getSortingOptions();
     algoliaService = MarineMax.Algolia;
 
     function getAlgoliaHelper(boatFilter) {
@@ -64,10 +64,10 @@ MarineMax.BoatRepository = function () {
     }
 
     function getSortingOption(boatFilter) {
-        var sortField = sortingOptions[boatFilter.sortIndex];
+        var sortField = getSortingOptions()[boatFilter.sortIndex];
 
         if (!sortField) {
-            sortField = sortingOptions['default'];
+            sortField = getSortingOptions()['default'];
         }
 
         return sortField;
@@ -245,8 +245,32 @@ MarineMax.BoatRepository = function () {
         return numMiles * 1609;
     }
 
+    function getInventoryByObjectIds(objectIds) {
+        var client, index;
+
+        var deferred = $.Deferred();
+
+        if (!objectIds || !objectIds.length) {
+            deferred.resolve([]);
+        }
+
+        client = algoliaService.getClient();
+        index = client.initIndex(getSortingOptions().default);
+        index.getObjects(objectIds, function (err, content) {
+            if (err || !content) {
+                deferred.reject('error calling algolia');
+            }
+            else {
+                deferred.resolve(content.results);
+            }
+        });
+
+        return deferred.promise();
+    }
+
     //public methods
     return {
-        getInventoryWithRefinements: getInventoryWithRefinements
+        getInventoryWithRefinements: getInventoryWithRefinements,
+        getInventoryByObjectIds: getInventoryByObjectIds
     };
 }();

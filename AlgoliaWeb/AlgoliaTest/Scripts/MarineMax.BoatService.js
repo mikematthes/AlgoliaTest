@@ -337,6 +337,10 @@ MarineMax.BoatService = function () {
         return isExists;
     }
 
+    function getInventoryByObjectIds(objectIds) {
+        var repo = MarineMax.BoatRepository;
+        repo.getInventoryByObjectIds(objectIds);
+    }
 
     //This object needs to be sent to getInventoryWithRefinements
     function BoatFilter() {
@@ -384,6 +388,7 @@ MarineMax.BoatService = function () {
 
     //public methods
     return {
+        getInventoryByObjectIds: MarineMax.BoatRepository.getInventoryByObjectIds,
         getInventoryWithRefinements: getInventoryWithRefinements,
         setCallback: setCallback,
         BoatFilter: BoatFilter
