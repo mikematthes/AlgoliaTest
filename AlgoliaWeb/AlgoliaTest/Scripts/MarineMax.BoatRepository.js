@@ -12,6 +12,7 @@ MarineMax.BoatRepository = function () {
 
         $.getJSON("/api/algolia/indexes", function (data) {
             if (data) {
+                _sortingOptions = data;
                 deferred.resolve(data);
             }
             else
@@ -24,8 +25,6 @@ MarineMax.BoatRepository = function () {
     function getSortingOptions() {
         if (_sortingOptions == null) {
             getIndexNames().then(function (data) {
-                _sortingOptions = data;
-
                 return _sortingOptions;
             }, function () {
                 throw "Getting index names failed";
@@ -44,21 +43,15 @@ MarineMax.BoatRepository = function () {
 
         var params = {
             facets: ['DealerId', 'modelLocationIDs', 'PromotionalBoat'],
-            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType', 'LifestyleList', 'ModelYearNumeric', 'LengthNumeric', 'PriceBucket', 'MakeModelDelimited'],
-            //hitsPerPage: 2
-            //aroundRadius: 120000,
-            //aroundLatLng: "0,0"
+            disjunctiveFacets: ['Make', 'Model', 'Condition', 'FuelType', 'MasterBoatClassType',
+                'LifestyleList', 'ModelYearNumeric', 'LengthNumeric', 'PriceBucket',
+                'MakeModelDelimited', 'PromotionNames'],
         };
-
 
         addFilters(params, boatFilter);
         var helper = algoliasearchHelper(client, getSortingOption(boatFilter), params);
 
         addRangeRefinements(helper, boatFilter);
-
-        //helper.addFacetRefinement("LocationsBrandSold", "44089")
-        //helper.addFacetRefinement("modelLocationIDs", "44227")
-        //helper.addNumericRefinement('PriceNumeric', '>', 29900000);
 
         return helper;
     }
@@ -185,59 +178,61 @@ MarineMax.BoatRepository = function () {
     //boatFilter: Create this object like this: 
     //              var bf = MarineMax.BoatFilter();
     function getInventoryWithRefinements(boatFilter) {
-        var helper = getAlgoliaHelper(boatFilter);
+        return getIndexNames().then(function () {
+            var helper = getAlgoliaHelper(boatFilter);
 
-        if (boatFilter) {
-            if (boatFilter.makeFacets) {
-                for (var index in boatFilter.makeFacets) {
-                    helper.addDisjunctiveFacetRefinement('Make', boatFilter.makeFacets[index]);
+            if (boatFilter) {
+                if (boatFilter.makeFacets) {
+                    for (var index in boatFilter.makeFacets) {
+                        helper.addDisjunctiveFacetRefinement('Make', boatFilter.makeFacets[index]);
+                    }
+                }
+                if (boatFilter.modelFacets) {
+                    for (var index in boatFilter.modelFacets) {
+                        helper.addDisjunctiveFacetRefinement('Model', boatFilter.modelFacets[index]);
+                    }
+                }
+                if (boatFilter.conditionFacets) {
+                    for (var index in boatFilter.conditionFacets) {
+                        helper.addDisjunctiveFacetRefinement('Condition', boatFilter.conditionFacets[index]);
+                    }
+                }
+                if (boatFilter.fuelTypeFacets) {
+                    for (var index in boatFilter.fuelTypeFacets) {
+                        helper.addDisjunctiveFacetRefinement('FuelType', boatFilter.fuelTypeFacets[index]);
+                    }
+                }
+                if (boatFilter.boatTypeFacets) {
+                    for (var index in boatFilter.boatTypeFacets) {
+                        helper.addDisjunctiveFacetRefinement('MasterBoatClassType', boatFilter.boatTypeFacets[index]);
+                    }
+                }
+                if (boatFilter.lifestyleFacet) {
+                    helper.addDisjunctiveFacetRefinement('LifestyleList', boatFilter.lifestyleFacet);
+                }
+                if (boatFilter.promotional) {
+                    helper.addFacetRefinement("PromotionalBoat", true);
                 }
             }
-            if (boatFilter.modelFacets) {
-                for (var index in boatFilter.modelFacets) {
-                    helper.addDisjunctiveFacetRefinement('Model', boatFilter.modelFacets[index]);
-                }
-            }
-            if (boatFilter.conditionFacets) {
-                for (var index in boatFilter.conditionFacets) {
-                    helper.addDisjunctiveFacetRefinement('Condition', boatFilter.conditionFacets[index]);
-                }
-            }
-            if (boatFilter.fuelTypeFacets) {
-                for (var index in boatFilter.fuelTypeFacets) {
-                    helper.addDisjunctiveFacetRefinement('FuelType', boatFilter.fuelTypeFacets[index]);
-                }
-            }
-            if (boatFilter.boatTypeFacets) {
-                for (var index in boatFilter.boatTypeFacets) {
-                    helper.addDisjunctiveFacetRefinement('MasterBoatClassType', boatFilter.boatTypeFacets[index]);
-                }
-            }
-            if (boatFilter.lifestyleFacet) {
-                helper.addDisjunctiveFacetRefinement('LifestyleList', boatFilter.lifestyleFacet);
-            }
-            if (boatFilter.promotional) {
-                helper.addFacetRefinement("PromotionalBoat", true);
-            }
-        }
 
-        var deferred = $.Deferred();
+            var deferred = $.Deferred();
 
 
-        helper.on('result', function (data) {
-            if (data) {
-                deferred.resolve(data);
-            }
-            else {
-                deferred.reject("error calling algolia");
-            }
+            helper.on('result', function (data) {
+                if (data) {
+                    deferred.resolve(data);
+                }
+                else {
+                    deferred.reject("error calling algolia");
+                }
 
+            });
+
+
+            helper.setPage(getPageFilter(boatFilter)).search();
+
+            return deferred.promise();
         });
-
-
-        helper.setPage(getPageFilter(boatFilter)).search();
-        
-        return deferred.promise();
     }
 
     function convertMilesToMeters(numMiles) {
@@ -246,26 +241,28 @@ MarineMax.BoatRepository = function () {
     }
 
     function getInventoryByObjectIds(objectIds) {
-        var client, index;
+        return getIndexNames().then(function () {
+            var client, index;
 
-        var deferred = $.Deferred();
+            var deferred = $.Deferred();
 
-        if (!objectIds || !objectIds.length) {
-            deferred.resolve([]);
-        }
-
-        client = algoliaService.getClient();
-        index = client.initIndex(getSortingOptions().default);
-        index.getObjects(objectIds, function (err, content) {
-            if (err || !content) {
-                deferred.reject('error calling algolia');
+            if (!objectIds || !objectIds.length) {
+                deferred.resolve([]);
             }
-            else {
-                deferred.resolve(content.results);
-            }
+
+            client = algoliaService.getClient();
+            index = client.initIndex(getSortingOptions().default);
+            index.getObjects(objectIds, function (err, content) {
+                if (err || !content) {
+                    deferred.reject('error calling algolia');
+                }
+                else {
+                    deferred.resolve(content.results);
+                }
+            });
+
+            return deferred.promise();
         });
-
-        return deferred.promise();
     }
 
     //public methods

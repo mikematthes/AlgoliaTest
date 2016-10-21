@@ -26,17 +26,47 @@ namespace AlgoliaTest.Controllers
 
         private void GetSettings()
         {
+
+            /*
+_indexNames = @"{
+    ""AscendingByLength"": ""MarineMaxSearchInventory-WWB-Stg-Length-Asc"",
+    ""DescendingByLength"": ""MarineMaxSearchInventory-WWB-Stg-Length-Desc"",
+    ""AscendingByBrand"": ""MarineMaxSearchInventory-WWB-Stg-Brand-Asc"",
+    ""DescendingByBrand"": ""MarineMaxSearchInventory-WWB-Stg-Brand-Desc"",
+    ""AscendingByYear"": ""MarineMaxSearchInventory-WWB-Stg-Year-Asc"",
+    ""DescendingByYear"": ""MarineMaxSearchInventory-WWB-Stg-Year-Desc"",
+    ""AscendingByPrice"": ""MarineMaxSearchInventory-WWB-Stg-Price-Asc"",
+    ""DescendingByPrice"": ""MarineMaxSearchInventory-WWB-Stg-Price-Desc"",
+    ""default"": ""MarineMaxSearchInventory-WWB-Stg-Length-Desc""
+    }";
+
             _indexNames = @"{
-                ""AscendingByLength"": ""MarineMaxSearchInventory-WWB-Stg-Length-Asc"",
-                ""DescendingByLength"": ""MarineMaxSearchInventory-WWB-Stg-Length-Desc"",
-                ""AscendingByBrand"": ""MarineMaxSearchInventory-WWB-Stg-Brand-Asc"",
-                ""DescendingByBrand"": ""MarineMaxSearchInventory-WWB-Stg-Brand-Desc"",
-                ""AscendingByYear"": ""MarineMaxSearchInventory-WWB-Stg-Year-Asc"",
-                ""DescendingByYear"": ""MarineMaxSearchInventory-WWB-Stg-Year-Desc"",
-                ""AscendingByPrice"": ""MarineMaxSearchInventory-WWB-Stg-Price-Asc"",
-                ""DescendingByPrice"": ""MarineMaxSearchInventory-WWB-Stg-Price-Desc"",
-                ""default"": ""MarineMaxSearchInventory-WWB-Stg-Length-Desc""
-                }";
+""AscendingByLength"": ""MarineMaxSearchInventory-WWB-Dev-Length-Asc"",
+""DescendingByLength"": ""MarineMaxSearchInventory-WWB-Dev-Length-Desc"",
+""AscendingByBrand"": ""MarineMaxSearchInventory-WWB-Dev-Brand-Asc"",
+""DescendingByBrand"": ""MarineMaxSearchInventory-WWB-Dev-Brand-Desc"",
+""AscendingByYear"": ""MarineMaxSearchInventory-WWB-Dev-Year-Asc"",
+""DescendingByYear"": ""MarineMaxSearchInventory-WWB-Dev-Year-Desc"",
+""AscendingByPrice"": ""MarineMaxSearchInventory-WWB-Dev-Price-Asc"",
+""DescendingByPrice"": ""MarineMaxSearchInventory-WWB-Dev-Price-Desc"",
+""default"": ""MarineMaxSearchInventory-WWB-Dev-Length-Desc""
+}";
+*/
+
+            _indexNames = @"{
+""AscendingByLength"": ""MarineMaxSearchInventory-StageOnPrem-Length-Asc"",
+""DescendingByLength"": ""MarineMaxSearchInventory-StageOnPrem-Length-Desc"",
+""AscendingByBrand"": ""MarineMaxSearchInventory-StageOnPrem-Brand-Asc"",
+""DescendingByBrand"": ""MarineMaxSearchInventory-StageOnPrem-Brand-Desc"",
+""AscendingByYear"": ""MarineMaxSearchInventory-StageOnPrem-Year-Asc"",
+""DescendingByYear"": ""MarineMaxSearchInventory-StageOnPrem-Year-Desc"",
+""AscendingByPrice"": ""MarineMaxSearchInventory-StageOnPrem-Price-Asc"",
+""DescendingByPrice"": ""MarineMaxSearchInventory-StageOnPrem-Price-Desc"",
+""default"": ""MarineMaxSearchInventory-StageOnPrem-Length-Desc""
+}";
+
+
+            //DetailedNavigationURL
         }
     }
 }
