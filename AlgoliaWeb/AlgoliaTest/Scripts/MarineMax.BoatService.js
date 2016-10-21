@@ -78,7 +78,7 @@ MarineMax.BoatService = function () {
             _boatFilter.thisStoreOnly = false;
         }
 
-        //This store only search
+            //This store only search
         else if (isRadiusSearchWithZeroMiles()) {
             console.log('Radius search with miles = 0')
             _boatFilter.showModelBoats = false;
@@ -88,7 +88,7 @@ MarineMax.BoatService = function () {
             _boatFilter.longitude = null;
         }
 
-        //National inventory search
+            //National inventory search
         else if (isRadiusSearchWithNullMiles()) {
             console.log('Radius search with NULL miles')
             _boatFilter.showModelBoats = true;
@@ -96,7 +96,7 @@ MarineMax.BoatService = function () {
             _boatFilter.radiusInMiles = 12500;
         }
 
-        //regular search
+            //regular search
         else {
             console.log('Not a radius search')
             _boatFilter.showModelBoats = true;
@@ -179,6 +179,7 @@ MarineMax.BoatService = function () {
             nationalFacetFilter.lengthEnd = _boatFilter.lengthEnd;
             nationalFacetFilter.keyword = _boatFilter.keyword;
             nationalFacetFilter.promotional = _boatFilter.promotional;
+            nationalFacetFilter.promotionalFacets = _boatFilter.promotionalFacets;
             nationalFacetFilter.dealerId = _boatFilter.dealerId;
             nationalFacetFilter.latitude = null;
             nationalFacetFilter.longitude = null;
@@ -227,7 +228,7 @@ MarineMax.BoatService = function () {
             nationalResults.nbHits = radiusResults.nbHits;
             nationalResults.hitsPerPage = radiusResults.hitsPerPage;
             nationalResults.nbPages = radiusResults.nbPages;
-            nationalResults.page = radiusResults.page; 
+            nationalResults.page = radiusResults.page;
 
             console.log('National facets not null');
 
@@ -254,8 +255,7 @@ MarineMax.BoatService = function () {
         }
     }
 
-    function FindFacetInResults(facetName, nationalResults, radiusResults)
-    {
+    function FindFacetInResults(facetName, nationalResults, radiusResults) {
         var theNationalFacets = nationalResults.getFacetValues(facetName);
         var isFacetMissingFromResults = false;
 
@@ -311,8 +311,7 @@ MarineMax.BoatService = function () {
     }
 
     //Check whether a Make exists in the list of Makes returned from Algolia
-    function isExistsByName(makesArray, key)
-    {
+    function isExistsByName(makesArray, key) {
         var isExists = false;
         for (var theIndex in makesArray) {
             if (makesArray[theIndex].name == key) {
@@ -365,6 +364,7 @@ MarineMax.BoatService = function () {
             //StockNumber, PriceNumeric, ModelYearNumeric, LengthNumeric
             keyword: null,
             promotional: false,
+            promotionalFacets: [],
 
             //Dealer ID: The list of makes will follow all franchise rules and will 
             //have the 4 exception brands
